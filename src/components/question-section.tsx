@@ -11,7 +11,7 @@ interface QuestionSectionProps {
 
 export const QuestionSection = ({ questions }: QuestionSectionProps) => {
   const [isPlaying, setIsPlaying] = useState(false);
-  const [isWebCam, setIsWebCam] = useState(false);
+  const [isWebCam, setIsWebCam] = useState(true);
 
   const [currentSpeech, setCurrentSpeech] =
     useState<SpeechSynthesisUtterance | null>(null);
@@ -81,7 +81,7 @@ export const QuestionSection = ({ questions }: QuestionSectionProps) => {
 
             <RecordAnswer
               question={tab}
-              isWebCam={isWebCam}
+              isWebCam={true}
               setIsWebCam={setIsWebCam}
             />
           </TabsContent>

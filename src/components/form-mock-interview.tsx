@@ -29,6 +29,7 @@ import {
   doc,
   serverTimestamp,
   updateDoc,
+  deleteDoc
 } from "firebase/firestore";
 import { db } from "@/config/firebase.config";
 
@@ -172,6 +173,27 @@ export const FormMockInterview = ({ initialData }: FormMockInterviewProps) => {
     }
   }, [initialData, form]);
 
+
+  // Deleting profile --->
+const handleDelete = async () => {
+  if (!initialData?.id) {
+    console.error("No ID provided");
+    return;
+  }
+
+  const confirmDelete = window.confirm("Are you sure you want to delete this profile?");
+  if (!confirmDelete) return;
+
+  try {
+    console.log("Attempting to delete:", initialData.id);
+    await deleteDoc(doc(db, "interviews", initialData.id));
+    toast.success("Profile deleted successfully.");
+    navigate("/generate");
+  } catch (error) {
+    console.error("Error deleting profile:", error);
+    toast.error("Failed to delete profile.");
+  }
+};
   return (
     <div className="w-full flex-col space-y-4">
       <CustomBreadCrumb
@@ -182,8 +204,10 @@ export const FormMockInterview = ({ initialData }: FormMockInterviewProps) => {
       <div className="mt-4 flex items-center justify-between w-full">
         <Headings title={title} isSubHeading />
 
+        {/* Delete button */}
+
         {initialData && (
-          <Button size={"icon"} variant={"ghost"}>
+          <Button size={"icon"} variant={"ghost"} onClick={handleDelete}>
             <Trash2 className="min-w-4 min-h-4 text-red-500" />
           </Button>
         )}

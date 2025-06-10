@@ -52,7 +52,7 @@ const HomePage = () => {
             className="w-full h-full object-cover"
           />
 
-          <div className="absolute top-4 left-4 px-4 py-2 rounded-md bg-white/40 backdrop-blur-md">
+          {/* <div className="absolute top-4 left-4 px-4 py-2 rounded-md bg-white/40 backdrop-blur-md">
             Inteviews Copilot&copy;
           </div>
 
@@ -66,7 +66,7 @@ const HomePage = () => {
             <Button className="mt-3">
               Generate <Sparkles />
             </Button>
-          </div>
+          </div> */}
         </div>
       </Container>
 

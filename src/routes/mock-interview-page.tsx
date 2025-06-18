@@ -81,8 +81,8 @@ export const MockInterviewPage = () => {
               <br />
               <br />
               <strong>Note:</strong>{" "}
-              <span className="font-medium">Your video is never recorded.</span>{" "}
-              You can disable the webcam anytime if preferred.
+              <span className="font-medium">Your video is being recorded.</span>{" "}
+              You cannot disable the webcam.
             </AlertDescription>
           </div>
         </Alert>

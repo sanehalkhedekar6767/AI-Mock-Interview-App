@@ -16,7 +16,7 @@ export const MockLoadPage = () => {
   const { interviewId } = useParams<{ interviewId: string }>();
   const [interview, setInterview] = useState<Interview | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [isWebCamEnabled, setIsWebCamEnabled] = useState(false);
+  const [isWebCamEnabled, setIsWebCamEnabled] = useState(true);
 
   const navigate = useNavigate();
 
@@ -80,13 +80,12 @@ export const MockLoadPage = () => {
           </AlertTitle>
           <AlertDescription className="text-sm text-yellow-700 mt-1">
             Please enable your webcam and microphone to start the AI-generated
-            mock interview. The interview consists of five questions. You’ll
+            mock interview. The interview consists of various questions. You’ll
             receive a personalized report based on your responses at the end.{" "}
             <br />
             <br />
             <span className="font-medium">Note:</span> Your video is{" "}
-            <strong>never recorded</strong>. You can disable your webcam at any
-            time.
+            <strong>being recorded</strong>. You cannot disable the webcam.
           </AlertDescription>
         </div>
       </Alert>
@@ -107,7 +106,8 @@ export const MockLoadPage = () => {
 
       <div className="flex items-center justify-center">
         <Button onClick={() => setIsWebCamEnabled(!isWebCamEnabled)}>
-          {isWebCamEnabled ? "Disable Webcam" : "Enable Webcam"}
+          {/* {isWebCamEnabled ? "Disable Webcam" : "Enable Webcam"} */}
+          {"Webcam Enabled"}
         </Button>
       </div>
     </div>

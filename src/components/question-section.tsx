@@ -54,7 +54,7 @@ export const QuestionSection = ({ questions }: QuestionSectionProps) => {
               key={tab.question}
               value={tab.question}
             >
-              {`Question #${i + 1}`}
+              {` #${i + 1}`}
             </TabsTrigger>
           ))}
         </TabsList>
@@ -81,7 +81,7 @@ export const QuestionSection = ({ questions }: QuestionSectionProps) => {
 
             <RecordAnswer
               question={tab}
-              isWebCam={true}
+              isWebCam={isWebCam}
               setIsWebCam={setIsWebCam}
             />
           </TabsContent>

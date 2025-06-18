@@ -13,6 +13,7 @@ import { Headings } from "./headings";
 import { Button } from "./ui/button";
 import { Loader, Trash2 } from "lucide-react";
 import { Separator } from "./ui/separator";
+
 import {
   FormControl,
   FormField,
@@ -26,10 +27,10 @@ import { chatSession } from "@/scripts";
 import {
   addDoc,
   collection,
+  deleteDoc,
   doc,
   serverTimestamp,
   updateDoc,
-  deleteDoc
 } from "firebase/firestore";
 import { db } from "@/config/firebase.config";
 
@@ -73,21 +74,14 @@ export const FormMockInterview = ({ initialData }: FormMockInterviewProps) => {
     : { title: "Created..!", description: "New Mock Interview created..." };
 
   const cleanAiResponse = (responseText: string) => {
-    // Step 1: Trim any surrounding whitespace
     let cleanText = responseText.trim();
-
-    // Step 2: Remove any occurrences of "json" or code block symbols (``` or `)
     cleanText = cleanText.replace(/(json|```|`)/g, "");
-
-    // Step 3: Extract a JSON array by capturing text between square brackets
     const jsonArrayMatch = cleanText.match(/\[.*\]/s);
     if (jsonArrayMatch) {
       cleanText = jsonArrayMatch[0];
     } else {
       throw new Error("No JSON array found in response");
     }
-
-    // Step 4: Parse the clean JSON text into an array of objects
     try {
       return JSON.parse(cleanText);
     } catch (error) {
@@ -97,26 +91,40 @@ export const FormMockInterview = ({ initialData }: FormMockInterviewProps) => {
 
   const generateAiResponse = async (data: FormData) => {
     const prompt = `
-        As an experienced prompt engineer, generate a JSON array containing 20 technical interview questions along with detailed answers based on the following job information. Each object in the array should have the fields "question" and "answer", formatted as follows:
+      Generate a JSON array with 20 technical interview questions and answers.
+      Format:
+      [
+        { "question": "?", "answer": "..." },
+        ...
+      ]
+      Job Info:
+      - Position: ${data.position}
+      - Description: ${data.description}
+      - Experience: ${data.experience}
+      - Tech Stack: ${data.techStack}
 
-        [
-          { "question": "<Question text>", "answer": "<Answer text>" },
-          ...
-        ]
-
-        Job Information:
-        - Job Position: ${data?.position}
-        - Job Description: ${data?.description}
-        - Years of Experience Required: ${data?.experience}
-        - Tech Stacks: ${data?.techStack}
-
-        The questions should assess skills in ${data?.techStack} development and best practices, problem-solving, and experience handling complex requirements. Please format the output strictly as an array of JSON objects without any additional labels, code blocks, or explanations. Return only the JSON array with questions and answers.
-        `;
+      Only return the JSON array.
+    `;
 
     const aiResult = await chatSession.sendMessage(prompt);
-    const cleanedResponse = cleanAiResponse(aiResult.response.text());
+    return cleanAiResponse(aiResult.response.text());
+  };
 
-    return cleanedResponse;
+  const onDelete = async () => {
+    try {
+      if (!initialData?.id) return;
+      setLoading(true);
+      await deleteDoc(doc(db, "interviews", initialData.id));
+      toast("Deleted", { description: "Interview deleted successfully." });
+      navigate("/generate", { replace: true });
+    } catch (error) {
+      console.log(error);
+      toast.error("Error..", {
+        description: `Delete failed. Try again later.`,
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   const onSubmit = async (data: FormData) => {
@@ -124,19 +132,17 @@ export const FormMockInterview = ({ initialData }: FormMockInterviewProps) => {
       setLoading(true);
 
       if (initialData) {
-        // update
         if (isValid) {
           const aiResult = await generateAiResponse(data);
 
-          await updateDoc(doc(db, "interviews", initialData?.id), {
+          await updateDoc(doc(db, "interviews", initialData.id), {
             questions: aiResult,
             ...data,
             updatedAt: serverTimestamp(),
-          }).catch((error) => console.log(error));
+          });
           toast(toastMessage.title, { description: toastMessage.description });
         }
       } else {
-        // create a new mock interview
         if (isValid) {
           const aiResult = await generateAiResponse(data);
 
@@ -173,27 +179,6 @@ export const FormMockInterview = ({ initialData }: FormMockInterviewProps) => {
     }
   }, [initialData, form]);
 
-
-  // Deleting profile --->
-const handleDelete = async () => {
-  if (!initialData?.id) {
-    console.error("No ID provided");
-    return;
-  }
-
-  const confirmDelete = window.confirm("Are you sure you want to delete this profile?");
-  if (!confirmDelete) return;
-
-  try {
-    console.log("Attempting to delete:", initialData.id);
-    await deleteDoc(doc(db, "interviews", initialData.id));
-    toast.success("Profile deleted successfully.");
-    navigate("/generate");
-  } catch (error) {
-    console.error("Error deleting profile:", error);
-    toast.error("Failed to delete profile.");
-  }
-};
   return (
     <div className="w-full flex-col space-y-4">
       <CustomBreadCrumb
@@ -204,18 +189,19 @@ const handleDelete = async () => {
       <div className="mt-4 flex items-center justify-between w-full">
         <Headings title={title} isSubHeading />
 
-        {/* Delete button */}
-
         {initialData && (
-          <Button size={"icon"} variant={"ghost"} onClick={handleDelete}>
+          <Button
+            size={"icon"}
+            variant={"ghost"}
+            disabled={loading}
+            onClick={onDelete}
+          >
             <Trash2 className="min-w-4 min-h-4 text-red-500" />
           </Button>
         )}
       </div>
 
       <Separator className="my-4" />
-
-      <div className="my-6"></div>
 
       <FormProvider {...form}>
         <form
@@ -257,7 +243,7 @@ const handleDelete = async () => {
                   <Textarea
                     className="h-12"
                     disabled={loading}
-                    placeholder="eg:- describle your job role"
+                    placeholder="eg:- describe your job role"
                     {...field}
                     value={field.value || ""}
                   />
@@ -280,7 +266,7 @@ const handleDelete = async () => {
                     type="number"
                     className="h-12"
                     disabled={loading}
-                    placeholder="eg:- 5 Years"
+                    placeholder="eg:- 5"
                     {...field}
                     value={field.value || ""}
                   />

@@ -234,9 +234,9 @@ export const RecordAnswer = ({
           content={isWebCam ? "Turn Off" : "Turn On"}
           icon={
             isWebCam ? (
-              <VideoOff className="min-w-5 min-h-5" />
-            ) : (
               <Video className="min-w-5 min-h-5" />
+            ) : (
+              <VideoOff className="min-w-5 min-h-5" />
             )
           }
           onClick={() => setIsWebCam(!isWebCam)}
@@ -278,7 +278,7 @@ export const RecordAnswer = ({
         <h2 className="text-lg font-semibold">Your Answer:</h2>
 
         <p className="text-sm mt-2 text-gray-700 whitespace-normal">
-          {userAnswer || "Start recording to see your ansewer here"}
+          {userAnswer || "Start recording to see your answer here"}
         </p>
 
         {interimResult && (
